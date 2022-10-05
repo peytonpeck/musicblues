@@ -8,12 +8,12 @@ export class Song {
     private audio: HTMLAudioElement;
 
     constructor(name: string, artist: string, path: string,
-                key: string) {
+                key: string, imagePath: string | undefined) {
         this.name = name;
         this.path = path;
         this.key = key;
         this.artist = artist;
-        this.imagePath = "https://interlude-cdn-blob-prod.azureedge.net/interlude-blob-storage-prod/2017/11/beethoven-wikimedia-square-300x300.jpg";
+        this.imagePath = imagePath || "https://interlude-cdn-blob-prod.azureedge.net/interlude-blob-storage-prod/2017/11/beethoven-wikimedia-square-300x300.jpg";
         this.audio = new Audio(`https://docs.google.com/uc?export=download&id=${path}`);
     }
 
@@ -38,8 +38,15 @@ export class Song {
     }
 
     public play: Function = (onEnd: any): void => {
-        this.audio.onended = onEnd;
+        this.audio.onended = () => {
+            onEnd();
+            this.setAudioTime(0);
+        }
         this.audio.play();
+    }
+
+    public setAudioTime: Function = (time: number): void => {
+        this.audio.currentTime = time;
     }
 
     public pause: Function = (): void => {

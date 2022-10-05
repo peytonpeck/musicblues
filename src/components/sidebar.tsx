@@ -4,8 +4,10 @@ const Sidebar = () => {
     return (
         <div className={"sidebar"}>
             <div className={"section"}>
-                <div>Playlists</div>
-                <div></div>
+                <div>Bumpin' Blues</div>
+                <div>Peyton's Playlist</div>
+                <div>Funky Feelings</div>
+                <div>Night of September 12th playlist</div>
             </div>
         </div>
     );
