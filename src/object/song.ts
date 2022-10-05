@@ -37,12 +37,16 @@ export class Song {
         return this.imagePath;
     }
 
-    public play: Function = (onEnd: any): void => {
+    public play: Function = (): void => {
+        this.audio.play();
+    }
+
+    public setOnAudioEnd = (onEnd: any): void => {
         this.audio.onended = () => {
             onEnd();
+            this.pause();
             this.setAudioTime(0);
         }
-        this.audio.play();
     }
 
     public setAudioTime: Function = (time: number): void => {
@@ -58,7 +62,7 @@ export class Song {
     }
 
     public isPlaying: Function = (): boolean => {
-        return this.audio.paused;
+        return !this.audio.paused;
     }
 
 }

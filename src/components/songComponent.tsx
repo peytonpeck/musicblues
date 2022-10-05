@@ -27,11 +27,12 @@ const SongComponent = ({song, index, setSong, isSelected}: {song: Song, index: n
         return format;
     }
 
+    const backgroundColorStyle = {backgroundColor: '#061c00'}
+
     return (
-        <div className={"song-component"} onClick={() => setSong(song)}>
+        <div className={"song-component"} onClick={() => setSong(song)} style={isSelected ? backgroundColorStyle : {}}>
             <div className={"song-index"}>{index}</div>
-            <div className={"song-image"}
-                 style={{backgroundImage: `url(${song.getImage()})`}}></div>
+            <div className={"song-image"} style={{backgroundImage: `url(${song.getImage()})`}}/>
             <div className={"song-info"}>
                 <div className={"song-name"} style={{color: `${isSelected ? "#02f102" : "white"}`}}>
                     {song.getName()}

@@ -26,28 +26,10 @@ const MusicPlayer = () => {
             currentSong.song.setAudioTime(0);
         }
 
+        const now = Date.now();
         song.play();
-        setCurrentSong({song, start: Date.now(), paused: false})
+        setCurrentSong({song, start: now, paused: false})
     }
-
-    const songComponents = songs.map((s: Song, index) =>
-        <SongComponent
-            setSong={setNewSong}
-            index={index + 1}
-            song={s}
-            key={s.getName()}
-            isSelected={currentSong.song === s}
-        />);
-
-    // Plays the song when a new song is selected
-    useEffect(() => {
-        if (currentSong.song) {
-            if (currentSong.paused)
-                currentSong.song.pause();
-            else if (!currentSong.song.isPlaying())
-                currentSong.song.play(() => pauseIfSameSong(currentSong.start));
-        }
-    }, [currentSong])
 
     const pauseIfSameSong = (timePlayed: number) => {
         if (currentSong.start === timePlayed) {
@@ -71,11 +53,34 @@ const MusicPlayer = () => {
         event.preventDefault();
     }
 
+    const songComponents = songs.map((s: Song, index) =>
+        <SongComponent
+            setSong={setNewSong}
+            index={index + 1}
+            song={s}
+            key={s.getName()}
+            isSelected={currentSong.song === s}
+        />);
+
+    // Plays the song when a new song is selected
     useEffect(() => {
+        // Add event listener for all keys
         document.addEventListener('keyup', listener, false)
 
+        if (currentSong.song) {
+            if (currentSong.paused)
+                currentSong.song.pause();
+            else {
+                if (!currentSong.song.isPlaying()) {
+                    currentSong.song.play();
+                }
+                currentSong.song.setOnAudioEnd(() => pauseIfSameSong(currentSong.start));
+            }
+        }
+
+        // Remove event listener on rerender
         return () => document.removeEventListener('keyup', listener);
-    }, [currentSong]);
+    }, [currentSong])
 
     return (
         <div className={"music-player"}>

@@ -7,7 +7,7 @@ const Sidebar = () => {
                 <div>Bumpin' Blues</div>
                 <div>Peyton's Playlist</div>
                 <div>Funky Feelings</div>
-                <div>Night of September 12th playlist</div>
+                <div>Daddy's Playlist</div>
             </div>
         </div>
     );
