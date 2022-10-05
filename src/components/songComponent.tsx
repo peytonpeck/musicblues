@@ -1,7 +1,7 @@
 import React from 'react';
 import {Song} from "../object/song";
 
-const SongComponent = ({song, index, setSong}: {song: Song, index: number, setSong: Function}) => {
+const SongComponent = ({song, index, setSong, isSelected}: {song: Song, index: number, setSong: Function, isSelected: boolean}) => {
 
     const formatTime = (time: number): string => {
 
@@ -33,8 +33,12 @@ const SongComponent = ({song, index, setSong}: {song: Song, index: number, setSo
             <div className={"song-image"}
                  style={{backgroundImage: `url(${song.getImage()})`}}></div>
             <div className={"song-info"}>
-                <div className={"song-name"}>{song.getName()}</div>
-                <div className={"artist-name"}>{song.getArtist()}</div>
+                <div className={"song-name"} style={{color: `${isSelected ? "#02f102" : "white"}`}}>
+                    {song.getName()}
+                </div>
+                <div className={"artist-name"} style={{color: `${isSelected ? "white" : "gray"}`}}>
+                    {song.getArtist()}
+                </div>
             </div>
             <div className={"song-duration"}>{formatTime(song.getDuration())}</div>
         </div>

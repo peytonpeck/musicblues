@@ -16,9 +16,15 @@ const songs: Song[] = [new Song("Bumpin' Blues #1", "Blake Ekeler ft. Peyton Pec
 const MusicPlayer = () => {
 
     const [isPaused, setPaused] = useState(false);
-    const [song, setSong] = useState<{song: Song | undefined, start: number}>({ song: undefined, start: 0});
-    const songComponents = songs.map((song, index) =>
-        <SongComponent setSong={setSong} index={index + 1} song={song} key={song.getName()}/>);
+    const [songObject, setSongObject] = useState<{song: Song | undefined, start: number}>({ song: undefined, start: 0});
+    const songComponents = songs.map((s: Song, index) =>
+        <SongComponent
+            setSong={setSongObject}
+            index={index + 1}
+            song={s}
+            key={s.getName()}
+            isSelected={songObject.song === s}
+        />);
 
     // Plays the song when a new song is selected
     useEffect(() => {
@@ -27,33 +33,36 @@ const MusicPlayer = () => {
                 s.pause();
                 s.setAudioTime(0);
         })
-        if (song.song) {
-            song.song.play(() => pauseIfSameSong(song.start));
+        if (songObject.song) {
+            songObject.song.play(() => pauseIfSameSong(songObject.start));
         }
-    }, [song])
+    }, [songObject])
 
     useEffect(() => {
-        if (song.song) {
-            if (isPaused)
-                song.song.pause();
-            else
-                song.song.play(() => pauseIfSameSong(song.start));
+        console.log("paused");
+        if (songObject.song) {
+            if (isPaused) songObject.song.pause();
+            else songObject.song.play(() => pauseIfSameSong(songObject.start));
         }
     }, [isPaused])
 
     const pauseIfSameSong = (timePlayed: number) => {
-        if (song.start === timePlayed) {
+        if (songObject.start === timePlayed) {
             setPaused(true);
         }
     }
 
     const listener = (event: KeyboardEvent) => {
-        const key = parseInt(event.key);
+        const key = event.key;
+        const keyAsNumber = parseInt(event.key);
 
-        if (key) {
-            if (songs.length >= key) {
-                setSong({song: songs[key - 1], start: Date.now()});
+        if (keyAsNumber) {
+            if (songs.length >= keyAsNumber) {
+                setSongObject({song: songs[keyAsNumber - 1], start: Date.now()});
             }
+        } else if (key === " ") {
+            console.log("space", isPaused, !isPaused);
+            setPaused(!isPaused);
         }
         event.preventDefault();
     }
@@ -70,7 +79,7 @@ const MusicPlayer = () => {
             <div className={"music-player-main"}>
                 {songComponents}
             </div>
-            <PlayBar song={song.song} isPaused={isPaused} setPaused={setPaused}/>
+            <PlayBar song={songObject.song} isPaused={isPaused} setPaused={setPaused}/>
         </div>
     );
 };
