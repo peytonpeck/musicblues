@@ -28,7 +28,7 @@ const SongComponent = ({song, index, setSong, isSelected}: {song: Song, index: n
     }
 
     return (
-        <div className={"song-component"} onClick={() => setSong({song, start: Date.now()})}>
+        <div className={"song-component"} onClick={() => setSong(song)}>
             <div className={"song-index"}>{index}</div>
             <div className={"song-image"}
                  style={{backgroundImage: `url(${song.getImage()})`}}></div>

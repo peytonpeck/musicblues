@@ -57,4 +57,8 @@ export class Song {
         return this.audio.duration;
     }
 
+    public isPlaying: Function = (): boolean => {
+        return this.audio.paused;
+    }
+
 }

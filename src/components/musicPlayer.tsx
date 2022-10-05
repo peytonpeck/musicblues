@@ -5,6 +5,7 @@ import PlayBar from "./playBar";
 import {Song} from "../object/song";
 import SongComponent from "./songComponent";
 import Sidebar from "./sidebar";
+import PlaylistBanner from "./playlistBanner";
 
 const songs: Song[] = [new Song("Bumpin' Blues #1", "Blake Ekeler ft. Peyton Peck", "1mxW1Zq8Bm-qLecG_JMRZ7IzPmv5FqvCv", "1", undefined),
                new Song("Bumpin' Blues #2", "Landen Fogle", "19oH5VfLNryQ1fFE2N_-f32HgzWvFD_Jw", "2", undefined),
@@ -15,54 +16,57 @@ const songs: Song[] = [new Song("Bumpin' Blues #1", "Blake Ekeler ft. Peyton Pec
 
 const MusicPlayer = () => {
 
-    const [isPaused, setPaused] = useState(false);
-    const [songObject, setSongObject] = useState<{song: Song | undefined, start: number}>({ song: undefined, start: 0});
+    const [currentSong, setCurrentSong] = useState
+            <{song: Song | undefined, start: number, paused: boolean}>
+            ({ song: undefined, start: 0, paused: true});
+
+    const setNewSong = (song: Song): void => {
+        if (currentSong.song) {
+            currentSong.song.pause();
+            currentSong.song.setAudioTime(0);
+        }
+
+        song.play();
+        setCurrentSong({song, start: Date.now(), paused: false})
+    }
+
     const songComponents = songs.map((s: Song, index) =>
         <SongComponent
-            setSong={setSongObject}
+            setSong={setNewSong}
             index={index + 1}
             song={s}
             key={s.getName()}
-            isSelected={songObject.song === s}
+            isSelected={currentSong.song === s}
         />);
 
     // Plays the song when a new song is selected
     useEffect(() => {
-        setPaused(false);
-        songs.forEach(s => {
-                s.pause();
-                s.setAudioTime(0);
-        })
-        if (songObject.song) {
-            songObject.song.play(() => pauseIfSameSong(songObject.start));
+        if (currentSong.song) {
+            if (currentSong.paused)
+                currentSong.song.pause();
+            else if (!currentSong.song.isPlaying())
+                currentSong.song.play(() => pauseIfSameSong(currentSong.start));
         }
-    }, [songObject])
-
-    useEffect(() => {
-        console.log("paused");
-        if (songObject.song) {
-            if (isPaused) songObject.song.pause();
-            else songObject.song.play(() => pauseIfSameSong(songObject.start));
-        }
-    }, [isPaused])
+    }, [currentSong])
 
     const pauseIfSameSong = (timePlayed: number) => {
-        if (songObject.start === timePlayed) {
-            setPaused(true);
+        if (currentSong.start === timePlayed) {
+            setCurrentSong({...currentSong, paused: true})
         }
     }
 
+    // Plays a song when a key is pressed
     const listener = (event: KeyboardEvent) => {
         const key = event.key;
         const keyAsNumber = parseInt(event.key);
 
+        // If the key is a number, set the song
         if (keyAsNumber) {
             if (songs.length >= keyAsNumber) {
-                setSongObject({song: songs[keyAsNumber - 1], start: Date.now()});
+                setNewSong(songs[keyAsNumber-1]);
             }
-        } else if (key === " ") {
-            console.log("space", isPaused, !isPaused);
-            setPaused(!isPaused);
+        } else if (key === " " && currentSong.song) {
+            setCurrentSong({...currentSong, paused: !currentSong.paused})
         }
         event.preventDefault();
     }
@@ -71,15 +75,19 @@ const MusicPlayer = () => {
         document.addEventListener('keyup', listener, false)
 
         return () => document.removeEventListener('keyup', listener);
-    }, []);
+    }, [currentSong]);
 
     return (
         <div className={"music-player"}>
             <Sidebar/>
             <div className={"music-player-main"}>
+                <PlaylistBanner/>
                 {songComponents}
             </div>
-            <PlayBar song={songObject.song} isPaused={isPaused} setPaused={setPaused}/>
+            <PlayBar song={currentSong.song}
+                     isPaused={currentSong.paused}
+                     setPaused={(paused: boolean) => setCurrentSong({...currentSong, paused: paused})}
+            />
         </div>
     );
 };
